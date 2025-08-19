@@ -23,7 +23,15 @@ gemini_api_key = st.secrets["GEMINI_API_KEY"]
 
 # Sidebar for entering link
 st.sidebar.title("Settings")
-link = st.sidebar.text_input("Enter a webpage link:", "https://docs.smith.langchain.com/")
+link = st.sidebar.text_input("Enter a webpage link:", " ")
+st.sidebar.markdown(
+    "🔎 **How to use:**\n"
+    "1. Enter a webpage link above.\n"
+    "2. Type your question in the input box.\n"
+    "3. The bot will fetch context from the page and answer instantly.\n\n"
+    "_Tip: Use it to quickly understand long docs or articles!_"
+)
+
 
 # Only load vectors when link changes
 if link and ("vector" not in st.session_state or st.session_state.get("current_link") != link):
