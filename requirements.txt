@@ -9,3 +9,5 @@ langchain-google-genai
 faiss-cpu
 google-generativeai
 groq
+beautifulsoup4
+requests
