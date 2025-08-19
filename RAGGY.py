@@ -23,7 +23,7 @@ gemini_api_key = st.secrets["GEMINI_API_KEY"]
 
 # Sidebar for entering link
 st.sidebar.title("Settings")
-link = st.sidebar.text_input("Enter a webpage link:", " ")
+link = st.sidebar.text_input("Enter a webpage link:", "https://docs.smith.langchain.com/")
 st.sidebar.markdown(
     "🔎 **How to use:**\n"
     "1. Enter a webpage link above.\n"
