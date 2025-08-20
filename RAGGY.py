@@ -36,7 +36,7 @@ st.sidebar.markdown(
 # Only load vectors when link changes
 if link and ("vector" not in st.session_state or st.session_state.get("current_link") != link):
     st.session_state.current_link = link
-    st.session_state.embeddings = GoogleGenerativeAIEmbeddings(model="models/gemini-embedding-001", google_api_key = gemini_api_key)
+    st.session_state.embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001", google_api_key = gemini_api_key)
     st.session_state.loader = WebBaseLoader(link)
     st.session_state.docs = st.session_state.loader.load()
     st.session_state.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
