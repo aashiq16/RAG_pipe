@@ -24,7 +24,7 @@ except RuntimeError:
 groq_api_key = st.secrets["GROQ_API_KEY"]
 gemini_api_key = st.secrets["GEMINI_API_KEY"]
 github_token = st.secrets["GITHUB_TOKEN"]  # 🔑 Add this to your Streamlit secrets
-github_repo = "your-username/your-repo"   # change this
+github_repo = "aashiq16/RAG_pipe"   # change this
 github_file_path = "qa_log.json"          # file inside repo
 
 # ---------------- Logging function ----------------
