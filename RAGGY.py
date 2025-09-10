@@ -8,109 +8,60 @@ from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.chains import create_retrieval_chain
 from langchain_community.vectorstores import FAISS
+from dotenv import load_dotenv
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
-from langchain_google_genai._common import GoogleGenerativeAIError
 
-# Initialize a new event loop if one is not running (required for some environments like Streamlit Cloud)
+load_dotenv()
+
 try:
     asyncio.get_running_loop()
 except RuntimeError:
     asyncio.set_event_loop(asyncio.new_event_loop())
 
-# --- Page Configuration and Sidebar ---
-st.set_page_config(page_title="Groq BOT InstaContext", page_icon="🤖")
+groq_api_key = st.secrets["GROQ_API_KEY"]
+gemini_api_key = st.secrets["GEMINI_API_KEY"]
 
+# Sidebar for entering link
 st.sidebar.title("Settings")
 link = st.sidebar.text_input("Enter a webpage link:", "https://docs.smith.langchain.com/")
-st.sidebar.markdown(
-    "🔎 **How to use:**\n"
-    "1. Enter a webpage link above.\n"
-    "2. Type your question in the input box.\n"
-    "3. The bot will fetch context from the page and answer instantly.\n\n"
-    "_Tip: Use it to quickly understand long docs or articles!_"
-)
 
-# --- API Key Validation ---
-# Accessing secrets for API keys
-try:
-    groq_api_key = st.secrets["GROQ_API_KEY"]
-    gemini_api_key = st.secrets["GEMINI_API_KEY"]
-except KeyError as e:
-    st.error(f"Missing API key in Streamlit secrets: {e}. Please configure your `secrets.toml` file.")
-    st.stop()
+# Only load vectors when link changes
+if link and ("vector" not in st.session_state or st.session_state.get("current_link") != link):
+    st.session_state.current_link = link
+    st.session_state.embeddings = GoogleGenerativeAIEmbeddings(model="models/gemini-embedding-001", google_api_key = gemini_api_key)
+    st.session_state.loader = WebBaseLoader(link)
+    st.session_state.docs = st.session_state.loader.load()
+    st.session_state.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+    st.session_state.final_documents = st.session_state.text_splitter.split_documents(st.session_state.docs[:50])
+    st.session_state.vectors = FAISS.from_documents(st.session_state.final_documents, st.session_state.embeddings)
 
-# --- Main App Content ---
 st.title("Groq BOT InstaContext")
 st.subheader("Get instant context from a webpage.")
 
-# Only load and embed documents if the link has changed or vectors don't exist
-if link and ("vector" not in st.session_state or st.session_state.get("current_link") != link):
-    st.session_state.current_link = link
-    
-    with st.spinner("Loading and processing the webpage..."):
-        try:
-            st.session_state.embeddings = GoogleGenerativeAIEmbeddings(
-                model="models/embedding-001", 
-                google_api_key=gemini_api_key
-            )
-            
-            st.session_state.loader = WebBaseLoader(link)
-            st.session_state.docs = st.session_state.loader.load()
-            
-            st.session_state.text_splitter = RecursiveCharacterTextSplitter(
-                chunk_size=1000, 
-                chunk_overlap=200
-            )
-            
-            st.session_state.final_documents = st.session_state.text_splitter.split_documents(
-                st.session_state.docs[:50]
-            )
-            
-            st.session_state.vectors = FAISS.from_documents(
-                st.session_state.final_documents,
-                st.session_state.embeddings
-            )
-            st.success("Webpage processed successfully!")
-            
-        except GoogleGenerativeAIError as e:
-            st.error(
-                "A Gemini API error occurred during embedding. "
-                "Please check your API key and ensure it is valid and has "
-                "permissions for the `embedding-001` model."
-            )
-            st.error(f"Underlying error: {e}")
-            st.stop()
-        except Exception as e:
-            st.error(f"An unexpected error occurred during document processing: {e}")
-            st.stop()
+llm = ChatGroq(groq_api_key=groq_api_key, model_name="openai/gpt-oss-20b")
 
-if "vectors" in st.session_state:
-    llm = ChatGroq(groq_api_key=groq_api_key, model_name="mixtral-8x7b-32768")
+prompt = ChatPromptTemplate.from_messages([
+    ("system", "You are a helpful assistant. Always answer based only on the provided context."),
+    ("human", """
+<context>
+{context}
+<context>
+Question: {input}
+""")
+])
 
-    prompt = ChatPromptTemplate.from_messages([
-        ("system", "You are a helpful assistant. Always answer based only on the provided context."),
-        ("human", """
-    <context>
-    {context}
-    <context>
-    Question: {input}
-    """)
-    ])
+document_chain = create_stuff_documents_chain(llm, prompt)
+retriever = st.session_state.vectors.as_retriever()
+retriever_chain = create_retrieval_chain(retriever, document_chain)
 
-    document_chain = create_stuff_documents_chain(llm, prompt)
-    retriever = st.session_state.vectors.as_retriever()
-    retriever_chain = create_retrieval_chain(retriever, document_chain)
+user_question = st.text_input("Ask a question about the link:")
 
-    user_question = st.text_input("Ask a question about the link:")
+if user_question:
+    response = retriever_chain.invoke({"input": user_question})
+    st.write(response["answer"])
 
-    if user_question:
-        with st.spinner("Getting your answer..."):
-            response = retriever_chain.invoke({"input": user_question})
-            st.write(response["answer"])
-
-            # With a streamlit expander
-            with st.expander("Document Similarity Search"):
-                for i, doc in enumerate(response["context"]):
-                    st.write(f"**Document {i+1}**")
-                    st.write(doc.page_content)
-                    st.write("---")
+    # With a streamlit expander
+    with st.expander("Document Similarity Search"):
+        for i, doc in enumerate(response["context"]):
+            st.write(doc.page_content)
+            st.write("--------------------------------")
