@@ -33,7 +33,7 @@ def log_to_github(repo, path, message, token):
     url = f"https://api.github.com/repos/{repo}/contents/{path}"
     headers = {"Authorization": f"Bearer {token}"}
 
-    # Check if file exists (to get SHA for updating instead of overwriting)
+    # Check if file exists
     r = requests.get(url, headers=headers)
     sha = None
     if r.status_code == 200:
@@ -45,12 +45,14 @@ def log_to_github(repo, path, message, token):
     data = {
         "message": "Append Q&A log",
         "content": encoded_content,
-        "branch": "main",   # change if your branch is 'master'
+        "branch": "main",  # change if your branch is 'master'
     }
     if sha:
         data["sha"] = sha
 
     r = requests.put(url, headers=headers, json=data)
+    if r.status_code not in (200, 201):
+        st.warning(f"⚠️ Failed to log Q&A: {r.json()}")
     return r.json()
 # ---------------- Streamlit UI ----------------
 st.sidebar.title("Settings")
