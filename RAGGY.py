@@ -1,5 +1,6 @@
 import streamlit as st
 import asyncio
+import base64
 import os
 import json
 import requests
