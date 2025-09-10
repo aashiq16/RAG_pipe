@@ -1,6 +1,9 @@
 import streamlit as st
 import asyncio
 import os
+import json
+import requests
+from datetime import datetime
 from langchain_groq import ChatGroq
 from langchain_community.document_loaders import WebBaseLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -20,8 +23,54 @@ except RuntimeError:
 
 groq_api_key = st.secrets["GROQ_API_KEY"]
 gemini_api_key = st.secrets["GEMINI_API_KEY"]
+github_token = st.secrets["GITHUB_TOKEN"]  # 🔑 Add this to your Streamlit secrets
+github_repo = "your-username/your-repo"   # change this
+github_file_path = "qa_log.json"          # file inside repo
 
-# Sidebar for entering link
+# ---------------- Logging function ----------------
+def log_to_github(question, answer):
+    url = f"https://api.github.com/repos/{github_repo}/contents/{github_file_path}"
+
+    headers = {"Authorization": f"token {github_token}"}
+
+    # Get current file content
+    r = requests.get(url, headers=headers)
+    if r.status_code == 200:
+        data = r.json()
+        sha = data["sha"]
+        try:
+            content = json.loads(requests.get(data["download_url"]).text)
+        except Exception:
+            content = []
+    else:
+        sha = None
+        content = []
+
+    # Append new log
+    content.append({
+        "timestamp": datetime.now().isoformat(),
+        "question": question,
+        "answer": answer
+    })
+
+    # Encode content
+    new_content = json.dumps(content, indent=2).encode("utf-8")
+
+    # Commit back to GitHub
+    res = requests.put(
+        url,
+        headers=headers,
+        json={
+            "message": f"Log Q&A {datetime.now().isoformat()}",
+            "content": new_content.decode("utf-8").encode("ascii", "ignore").decode(),
+            "sha": sha,
+        },
+    )
+
+    if res.status_code not in [200, 201]:
+        st.error(f"⚠️ Failed to log Q&A: {res.json()}")
+
+# ---------------- Streamlit UI ----------------
 st.sidebar.title("Settings")
 link = st.sidebar.text_input("Enter a webpage link:", "https://docs.smith.langchain.com/")
 
@@ -38,7 +87,10 @@ st.sidebar.markdown(
 # Only load vectors when link changes
 if link and ("vector" not in st.session_state or st.session_state.get("current_link") != link):
     st.session_state.current_link = link
-    st.session_state.embeddings = GoogleGenerativeAIEmbeddings(model="models/gemini-embedding-001", google_api_key = gemini_api_key)
+    st.session_state.embeddings = GoogleGenerativeAIEmbeddings(
+        model="models/gemini-embedding-001",
+        google_api_key=gemini_api_key
+    )
     st.session_state.loader = WebBaseLoader(link)
     st.session_state.docs = st.session_state.loader.load()
     st.session_state.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
@@ -69,6 +121,9 @@ user_question = st.text_input("Ask a question about the link:")
 if user_question:
     response = retriever_chain.invoke({"input": user_question})
     st.write(response["answer"])
+
+    # Log Q&A to GitHub
+    log_to_github(user_question, response["answer"])
 
     # With a streamlit expander
     with st.expander("Document Similarity Search"):
