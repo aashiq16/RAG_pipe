@@ -33,6 +33,8 @@ def log_to_github(question, answer):
 
     headers = {"Authorization": f"token {github_token}"}
 
+    encoded_content = base64.b64encode(message.encode("utf-8")).decode("utf-8")
+
     # Get current file content
     r = requests.get(url, headers=headers)
     if r.status_code == 200:
