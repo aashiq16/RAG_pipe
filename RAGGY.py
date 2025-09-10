@@ -41,7 +41,16 @@ if link and ("vector" not in st.session_state or st.session_state.get("current_l
     st.session_state.docs = st.session_state.loader.load()
     st.session_state.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
     st.session_state.final_documents = st.session_state.text_splitter.split_documents(st.session_state.docs[:50])
-    st.session_state.vectors = FAISS.from_documents(st.session_state.final_documents, st.session_state.embeddings)
+    try:
+        st.session_state.vectors = FAISS.from_documents(
+            st.session_state.final_documents,
+            st.session_state.embeddings
+        )
+    except Exception as e:
+        import traceback
+        print("REAL ERROR:", e)
+        traceback.print_exc()
+
 
 st.title("Groq BOT InstaContext")
 st.subheader("Get instant context from a webpage.")
