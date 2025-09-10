@@ -29,23 +29,35 @@ github_repo = "aashiq16/RAG_pipe"   # change this
 github_file_path = "qa_log.json"          # file inside repo
 
 # ---------------- Logging function ----------------
-def log_to_github(repo, path, message, token):
+def log_to_github(repo, path, new_entry, token):
     url = f"https://api.github.com/repos/{repo}/contents/{path}"
     headers = {"Authorization": f"Bearer {token}"}
 
     # Check if file exists
     r = requests.get(url, headers=headers)
     sha = None
+    logs = []
+
     if r.status_code == 200:
         sha = r.json()["sha"]
+        content = base64.b64decode(r.json()["content"]).decode("utf-8")
+        try:
+            logs = json.loads(content)
+        except json.JSONDecodeError:
+            logs = []
+    else:
+        logs = []
 
-    # Encode content as Base64
-    encoded_content = base64.b64encode(message.encode("utf-8")).decode("utf-8")
+    # Append new entry
+    logs.append(new_entry)
+
+    # Encode updated logs
+    encoded_content = base64.b64encode(json.dumps(logs, indent=2).encode("utf-8")).decode("utf-8")
 
     data = {
         "message": "Append Q&A log",
         "content": encoded_content,
-        "branch": "main",  # change if your branch is 'master'
+        "branch": "main",  # change if using "master"
     }
     if sha:
         data["sha"] = sha
@@ -54,6 +66,7 @@ def log_to_github(repo, path, message, token):
     if r.status_code not in (200, 201):
         st.warning(f"⚠️ Failed to log Q&A: {r.json()}")
     return r.json()
+
 # ---------------- Streamlit UI ----------------
 st.sidebar.title("Settings")
 link = st.sidebar.text_input("Enter a webpage link:", "https://docs.smith.langchain.com/")
