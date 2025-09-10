@@ -94,7 +94,7 @@ if link and ("vector" not in st.session_state or st.session_state.get("current_l
     st.session_state.final_documents = st.session_state.text_splitter.split_documents(st.session_state.docs[:50])
     st.session_state.vectors = FAISS.from_documents(st.session_state.final_documents, st.session_state.embeddings)
 
-st.title("Groq BOT InstaContext")
+st.title("🤖 Groq BOT InstaContext")
 st.subheader("Get instant context from a webpage.")
 
 llm = ChatGroq(groq_api_key=groq_api_key, model_name="openai/gpt-oss-20b")
