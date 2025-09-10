@@ -68,7 +68,7 @@ def log_to_github(repo, path, new_entry, token):
     return r.json()
 
 # ---------------- Streamlit UI ----------------
-st.sidebar.title("Settings")
+st.sidebar.title("⚙️ Settings")
 link = st.sidebar.text_input("Enter a webpage link:", "https://docs.smith.langchain.com/")
 
 st.sidebar.markdown(
