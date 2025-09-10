@@ -68,7 +68,11 @@ Question: {input}
 ])
 
 document_chain = create_stuff_documents_chain(llm, prompt)
-retriever = st.session_state.vectors.as_retriever()
+if "vectors" in st.session_state:
+    retriever = st.session_state.vectors.as_retriever()
+else:
+    st.error("Embeddings not created — check your API key, model, or quota.")
+
 retriever_chain = create_retrieval_chain(retriever, document_chain)
 
 user_question = st.text_input("Ask a question about the link:")
