@@ -6,5 +6,9 @@
   {
     "question": "what this app is about",
     "answer": "The page is describing **LangSmith**, a platform that helps you build and run production\u2011grade large\u2011language\u2011model (LLM) applications. It gives you:\n\n* **Observability** \u2013 trace every step your app takes when handling a request so you can debug quickly.  \n* **Evaluation** \u2013 measure and track the quality of your applications over time.  \n* **Prompt testing** \u2013 iterate on prompts with version control and collaboration tools.  \n* **Workspace setup** \u2013 configure admin settings and invite team members.\n\nLangSmith works with or without LangChain\u2019s frameworks, making it framework\u2011agnostic. In short, it\u2019s a toolset for monitoring, evaluating, and improving LLM applications so you can ship them faster and more reliably."
+  },
+  {
+    "question": "what is this link for ",
+    "answer": "The link is a gateway to LangSmith\u2019s documentation and resource hub.  \nFrom that page you can:\n\n* **Start tracing** \u2013 see every step your application takes so you can debug faster.  \n* **Evaluate your application** \u2013 monitor and measure its quality over time.  \n* **Test prompts** \u2013 iterate on prompts with version control and collaboration tools.  \n* **Set up a workspace** \u2013 configure admin settings and invite teammates.  \n\nIn short, it points you to the LangSmith platform\u2019s help center where you can learn more, get started, and access the various tools (Python SDK, JS/TS SDK, API references, pricing, etc.) that help you build and ship reliable LLM applications."
   }
 ]
