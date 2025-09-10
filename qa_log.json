@@ -1,1 +1,6 @@
-
+[
+  {
+    "question": "what is this app is about ?",
+    "answer": "The page is describing **LangSmith**, a platform that helps developers build, monitor, and improve large\u2011language\u2011model (LLM) applications. It offers features such as:\n\n- **Observability** \u2013 trace every step an LLM app takes to debug faster.  \n- **Evaluation** \u2013 measure and track the quality of your models over time.  \n- **Prompt testing** \u2013 iterate on prompts with version control and collaboration tools.  \n- **Self\u2011hosting & administration** \u2013 set up a workspace, configure settings, and invite team members.  \n\nIn short, LangSmith is a toolkit for making production\u2011grade LLM applications more reliable, transparent, and easier to ship."
+  }
+]
