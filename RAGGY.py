@@ -29,50 +29,29 @@ github_repo = "aashiq16/RAG_pipe"   # change this
 github_file_path = "qa_log.json"          # file inside repo
 
 # ---------------- Logging function ----------------
-def log_to_github(question, answer):
-    url = f"https://api.github.com/repos/{github_repo}/contents/{github_file_path}"
+def log_to_github(repo, path, message, token):
+    url = f"https://api.github.com/repos/{repo}/contents/{path}"
+    headers = {"Authorization": f"Bearer {token}"}
 
-    headers = {"Authorization": f"token {github_token}"}
+    # Check if file exists (to get SHA for updating instead of overwriting)
+    r = requests.get(url, headers=headers)
+    sha = None
+    if r.status_code == 200:
+        sha = r.json()["sha"]
 
+    # Encode content as Base64
     encoded_content = base64.b64encode(message.encode("utf-8")).decode("utf-8")
 
-    # Get current file content
-    r = requests.get(url, headers=headers)
-    if r.status_code == 200:
-        data = r.json()
-        sha = data["sha"]
-        try:
-            content = json.loads(requests.get(data["download_url"]).text)
-        except Exception:
-            content = []
-    else:
-        sha = None
-        content = []
+    data = {
+        "message": "Append Q&A log",
+        "content": encoded_content,
+        "branch": "main",   # change if your branch is 'master'
+    }
+    if sha:
+        data["sha"] = sha
 
-    # Append new log
-    content.append({
-        "timestamp": datetime.now().isoformat(),
-        "question": question,
-        "answer": answer
-    })
-
-    # Encode content
-    new_content = json.dumps(content, indent=2).encode("utf-8")
-
-    # Commit back to GitHub
-    res = requests.put(
-        url,
-        headers=headers,
-        json={
-            "message": f"Log Q&A {datetime.now().isoformat()}",
-            "content": new_content.decode("utf-8").encode("ascii", "ignore").decode(),
-            "sha": sha,
-        },
-    )
-
-    if res.status_code not in [200, 201]:
-        st.error(f"⚠️ Failed to log Q&A: {res.json()}")
-
+    r = requests.put(url, headers=headers, json=data)
+    return r.json()
 # ---------------- Streamlit UI ----------------
 st.sidebar.title("Settings")
 link = st.sidebar.text_input("Enter a webpage link:", "https://docs.smith.langchain.com/")
