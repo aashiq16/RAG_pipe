@@ -25,6 +25,16 @@ gemini_api_key = st.secrets["GEMINI_API_KEY"]
 st.sidebar.title("Settings")
 link = st.sidebar.text_input("Enter a webpage link:", "https://docs.smith.langchain.com/")
 
+st.sidebar.markdown(
+    """
+    **How to use this app:**
+    1. Enter the webpage link above.  
+    2. Type your question in the text box on the main page.  
+    3. The bot will answer based only on the content of that webpage.  
+    4. Expand *Document Similarity Search* to see related text snippets.  
+    """
+)
+
 # Only load vectors when link changes
 if link and ("vector" not in st.session_state or st.session_state.get("current_link") != link):
     st.session_state.current_link = link
