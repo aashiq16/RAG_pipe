@@ -41,15 +41,11 @@ if link and ("vector" not in st.session_state or st.session_state.get("current_l
     st.session_state.docs = st.session_state.loader.load()
     st.session_state.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
     st.session_state.final_documents = st.session_state.text_splitter.split_documents(st.session_state.docs[:50])
-    try:
-        st.session_state.vectors = FAISS.from_documents(
+    st.session_state.vectors = FAISS.from_documents(
             st.session_state.final_documents,
             st.session_state.embeddings
         )
-    except Exception as e:
-        import traceback
-        print("REAL ERROR:", e)
-        traceback.print_exc()
+   
 
 
 st.title("Groq BOT InstaContext")
@@ -68,11 +64,7 @@ Question: {input}
 ])
 
 document_chain = create_stuff_documents_chain(llm, prompt)
-if "vectors" in st.session_state:
-    retriever = st.session_state.vectors.as_retriever()
-else:
-    st.error("Embeddings not created — check your API key, model, or quota.")
-
+retriever = st.session_state.vectors.as_retriever()
 retriever_chain = create_retrieval_chain(retriever, document_chain)
 
 user_question = st.text_input("Ask a question about the link:")
