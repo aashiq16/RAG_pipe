@@ -119,11 +119,13 @@ if user_question:
     response = retriever_chain.invoke({"input": user_question})
     st.write(response["answer"])
 
-    # Log Q&A to GitHub
-    log_to_github(user_question, response["answer"])
-
-    # With a streamlit expander
-    with st.expander("Document Similarity Search"):
-        for i, doc in enumerate(response["context"]):
-            st.write(doc.page_content)
-            st.write("--------------------------------")
+    # Log Q&A
+    log_to_github(
+        repo="aashiq16/RAG_pipe",
+        path="qa_log.json",
+        new_entry={
+            "question": user_question,
+            "answer": response["answer"]
+        },
+        token=os.getenv("GITHUB_TOKEN")
+    )
