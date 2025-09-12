@@ -10,5 +10,9 @@
   {
     "question": "what is this link for ",
     "answer": "The link is a gateway to LangSmith\u2019s documentation and resource hub.  \nFrom that page you can:\n\n* **Start tracing** \u2013 see every step your application takes so you can debug faster.  \n* **Evaluate your application** \u2013 monitor and measure its quality over time.  \n* **Test prompts** \u2013 iterate on prompts with version control and collaboration tools.  \n* **Set up a workspace** \u2013 configure admin settings and invite teammates.  \n\nIn short, it points you to the LangSmith platform\u2019s help center where you can learn more, get started, and access the various tools (Python SDK, JS/TS SDK, API references, pricing, etc.) that help you build and ship reliable LLM applications."
+  },
+  {
+    "question": "hey how are you",
+    "answer": "I\u2019m sorry, but the provided context does not contain information about that."
   }
 ]
