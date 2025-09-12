@@ -18,5 +18,9 @@
   {
     "question": "what this doc is about ?",
     "answer": "The document is an overview of **LangSmith**, a platform for building, monitoring, and evaluating production\u2011grade large language model (LLM) applications. It explains how LangSmith provides:\n\n1. **Observability** \u2013 trace every step your app takes, giving visibility into request handling for faster debugging.  \n2. **Evaluation** \u2013 measure application quality over time to build more reliable AI systems.  \n3. **Prompt testing** \u2013 iterate on prompts with automatic version control and collaboration tools.  \n4. **Workspace setup** \u2013 configure admin settings and invite team members.  \n\nLangSmith works with or without LangChain\u2019s open\u2011source frameworks, offering SDKs, APIs, pricing, and community resources."
+  },
+  {
+    "question": "what this doc is about ?",
+    "answer": "The document is an overview and quick\u2011start guide for **LangSmith**, a platform that helps developers build, monitor, and evaluate large\u2011language\u2011model (LLM) applications. It explains:\n\n- What LangSmith is and its purpose (production\u2011grade LLM observability and evaluation).\n- Core features such as tracing requests, evaluating model performance, and testing prompts.\n- How to get started with LangSmith, including setting up a workspace, configuring admin settings, and inviting team members.\n- Links to additional resources like API/SDK references, pricing, and community forums."
   }
 ]
