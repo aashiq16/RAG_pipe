@@ -76,8 +76,7 @@ st.sidebar.markdown(
     **How to use this app:**
     1. Enter the webpage link above.  
     2. Type your question in the text box on the main page.  
-    3. The bot will answer based only on the content of that webpage.  
-    4. Expand *Document Similarity Search* to see related text snippets.  
+    3. The bot will answer based only on the content of that webpage.    
     """
 )
 
