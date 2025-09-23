@@ -40,5 +40,12 @@
     "answer": "The link is about getting started with LangSmith, a platform for building production-grade LLM (Large Language Model) applications.",
     "source": "https://docs.smith.langchain.com/",
     "source_type": "link"
+  },
+  {
+    "timestamp": "2025-09-23T12:55:09.830718",
+    "question": "give me a code snippet to setup the langsmith",
+    "answer": "Based on the provided context, it seems that LangSmith has a Python SDK. Here's a code snippet to get you started with setting up LangSmith:\n\n```python\n# Import the LangSmith SDK\nfrom langsmith import Langsmith\n\n# Initialize the Langsmith instance\nlangsmith = Langsmith()\n\n# Set up your workspace\nlangsmith.workspace.create(\n    name=\"my-workspace\",\n    description=\"My LangSmith workspace\"\n)\n\n# Invite team members to collaborate\nlangsmith.workspace.invite(\n    workspace_id=\"my-workspace\",\n    email=\"team-member@example.com\",\n    role=\"admin\"\n)\n\n# Set up admin settings\nlangsmith.admin_settings.update(\n    workspace_id=\"my-workspace\",\n    settings={\n        \"max_prompt_length\": 2048,\n        \"max_response_length\": 4096\n    }\n)\n```\n\nPlease note that this is a basic example and you may need to modify it according to your specific use case and requirements. Also, make sure to replace the placeholders (e.g., `my-workspace`, `team-member@example.com`) with your actual values.\n\nAlso, you can refer to the official LangSmith documentation for more information on setting up and using the platform: https://docs.langchain.com/platforms/langsmith/get-started.",
+    "source": "https://docs.smith.langchain.com/",
+    "source_type": "link"
   }
 ]
