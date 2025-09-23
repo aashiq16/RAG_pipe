@@ -33,5 +33,12 @@
     "answer": "Unfortunately, the provided text does not contain any information about the title of an HTTPBIN HTML page. The text appears to be a passage from Herman Melville's novel \"Moby-Dick\" and does not mention HTTPBIN at all. If you could provide more context or clarify your question, I'll be happy to help.",
     "source": "https://httpbin.org/html",
     "source_type": "link"
+  },
+  {
+    "timestamp": "2025-09-23T12:54:49.007357",
+    "question": "whats the link is about ?",
+    "answer": "The link is about getting started with LangSmith, a platform for building production-grade LLM (Large Language Model) applications.",
+    "source": "https://docs.smith.langchain.com/",
+    "source_type": "link"
   }
 ]
