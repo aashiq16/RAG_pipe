@@ -55,5 +55,9 @@
   {
     "question": "give me the context about this link",
     "answer": "I\u2019m happy to help! Could you let me know which specific link you\u2019d like more context about?"
+  },
+  {
+    "question": "give me the context about this link",
+    "answer": "The text you pasted is a snapshot of a page from the **HSBC Group website**, specifically the part of the site that deals with **investor relations** and, more narrowly, the **fixed\u2011income** segment of their investment offerings.\n\nKey points that the page covers:\n\n| Section | What it contains |\n|---------|------------------|\n| **Header & Navigation** | Links to online banking, search, social\u2011media share buttons (WhatsApp, Facebook, LinkedIn, X, etc.), a \u201cdownload basket\u201d feature for collecting documents, and a \u201cremember me\u201d login toggle. |\n| **Investor Information** | A dedicated area for investors with sub\u2011menus such as \u201cFixed income investors.\u201d |\n| **Fixed\u2011Income Content** | Sub\u2011pages or tabs titled: |\n| | \u2022\u202fOverview |\n| | \u2022\u202fFinal terms and supplements |\n| | \u2022\u202fIssuance programmes |\n| | \u2022\u202fCovered bonds |\n| | \u2022\u202fGreen Financing Framework |\n| | \u2022\u202fRegulatory debt main features |\n| | \u2022\u202fCredit ratings |\n| | \u2022\u202fESG investors |\n| | \u2022\u202fInvestor alerts |\n| | \u2022\u202fInvestor contacts |\n| **Additional Content** | A section titled \u201cINTERIM RESULTS 2025\u201d that provides access to documents and Zoom meeting details. |\n| **Footer** | Standard corporate links (Terms & conditions, Privacy notice, Cookie notice, Accessibility, etc.) and a copyright notice \u00a9 HSBC Group 2025. |\n\nIn short, the page is an investor\u2011focused resource hub for HSBC\u2019s fixed\u2011income products, offering detailed information, regulatory documents, ESG and green\u2011financing data, and contact points for investors."
   }
 ]
