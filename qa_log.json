@@ -67,5 +67,9 @@
   {
     "question": "what are the core values of HSBC, and give context about it",
     "answer": "**HSBC\u2019s Core Values**\n\n| Value | What it means (as described on HSBC\u2019s site) |\n|-------|----------------------------------------------|\n| **We get it done** | Moving at pace and making things happen. |\n| **We value difference** | Seeking out different perspectives. |\n| **We take responsibility** | Holding ourselves accountable and taking the long view. |\n| **We succeed together** | Collaborating across boundaries. |\n\n**Context**\n\nHSBC says its values are \u201crooted in HSBC\u2019s history, heritage and character\u201d and they guide every decision\u2014from strategy to day\u2011to\u2011day interactions with customers and colleagues. The values are meant to help the bank deliver on its purpose: to open up a world of opportunity for customers, investors and the communities it serves. By \u201cgetting it done,\u201d valuing diverse viewpoints, taking responsibility, and succeeding together, HSBC aims to build trust, act with good judgment, and create sustainable outcomes for all stakeholders."
+  },
+  {
+    "question": "what is this link is about ?",
+    "answer": "The link is pointing to the **\u201cTrace an application\u201d** section of LangSmith\u2019s documentation. It explains how to enable and use LangSmith\u2019s tracing feature to record every step your application takes when handling a request, so you can debug, monitor, and optimize your LLM\u2011powered app more effectively."
   }
 ]
