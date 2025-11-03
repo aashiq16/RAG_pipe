@@ -7,7 +7,8 @@ import requests
 from datetime import datetime
 from langchain_groq import ChatGroq
 from langchain_community.document_loaders import WebBaseLoader
-from langchain.text_splitters import RecursiveCharacterTextSplitter
+# FIX: Use the dedicated package for text splitters to prevent ModuleNotFoundError
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.chains import create_retrieval_chain
@@ -24,9 +25,9 @@ except RuntimeError:
 
 groq_api_key = st.secrets["GROQ_API_KEY"]
 gemini_api_key = st.secrets["GEMINI_API_KEY"]
-github_token = st.secrets["GITHUB_TOKEN"]  # 🔑 Add this to your Streamlit secrets
-github_repo = "aashiq16/RAG_pipe"   # change this
-github_file_path = "qa_log.json"          # file inside repo
+github_token = st.secrets["GITHUB_TOKEN"] # 🔑 Add this to your Streamlit secrets
+github_repo = "aashiq16/RAG_pipe"      # change this
+github_file_path = "qa_log.json"       # file inside repo
 
 # ---------------- Logging function ----------------
 def log_to_github(repo, path, new_entry, token):
@@ -57,7 +58,7 @@ def log_to_github(repo, path, new_entry, token):
     data = {
         "message": "Append Q&A log",
         "content": encoded_content,
-        "branch": "main",  # change if using "master"
+        "branch": "main", # change if using "master"
     }
     if sha:
         data["sha"] = sha
