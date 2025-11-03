@@ -9,7 +9,8 @@ from langchain_groq import ChatGroq
 from langchain_community.document_loaders import WebBaseLoader
 # FIX: Use the dedicated package for text splitters to prevent ModuleNotFoundError
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain.chains import create_retrieval_chain, create_stuff_documents_chain # CONSOLIDATED FIX: Importing both chain creators directly from langchain.chains
+from langchain.chains.combine_documents import create_stuff_documents_chain
+from langchain.chains.retrieval import create_retrieval_chain
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_community.vectorstores import FAISS
 from dotenv import load_dotenv
