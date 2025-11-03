@@ -7,15 +7,17 @@ import requests
 import time
 from datetime import datetime
 from dotenv import load_dotenv
+
 from langchain_groq import ChatGroq
 from langchain_community.document_loaders import WebBaseLoader
-from langchain_text_splitters import RecursiveCharacterTextSplitter  # ✅ fixed import
-from langchain.chains.combine_documents import create_stuff_documents_chain
-from langchain.prompts import ChatPromptTemplate  # ✅ updated path
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain.chains.combine_documents.stuff import create_stuff_documents_chain  # ✅ fixed import path
+from langchain.prompts import ChatPromptTemplate
 from langchain.chains import create_retrieval_chain
 from langchain_community.vectorstores import FAISS
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from google.api_core import exceptions as google_exceptions
+
 
 # ---------------- Load environment ----------------
 load_dotenv()
