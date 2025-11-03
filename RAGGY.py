@@ -5,15 +5,19 @@ import os
 import json
 import requests
 from datetime import datetime
+
+# LangChain & related modules
 from langchain_groq import ChatGroq
 from langchain_community.document_loaders import WebBaseLoader
-from langchain.text_splitters import RecursiveCharacterTextSplitter
-from langchain.chains.combine_documents import create_stuff_documents_chain
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain.chains.combine_documents.stuff import create_stuff_documents_chain
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.chains import create_retrieval_chain
 from langchain_community.vectorstores import FAISS
-from dotenv import load_dotenv
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
+
+# Environment loader
+from dotenv import load_dotenv
 
 load_dotenv()
 
