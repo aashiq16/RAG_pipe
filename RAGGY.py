@@ -6,21 +6,21 @@ import json
 import requests
 import time
 from datetime import datetime
+from dotenv import load_dotenv
 
 # LangChain & related modules
 from langchain_groq import ChatGroq
 from langchain_community.document_loaders import WebBaseLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain.chains.combine_documents.stuff import create_stuff_documents_chain
+from langchain.chains import create_retrieval_chain
 from langchain_core.prompts import ChatPromptTemplate
-from langchain.chains.retrieval import RetrievalQA
 from langchain_community.vectorstores import FAISS
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_google_genai._common import GoogleGenerativeAIError
 from langchain_community.embeddings import HuggingFaceEmbeddings
-from dotenv import load_dotenv
 
-# Load environment variables
+# ---------------- Load environment variables ----------------
 load_dotenv()
 
 try:
@@ -28,11 +28,12 @@ try:
 except RuntimeError:
     asyncio.set_event_loop(asyncio.new_event_loop())
 
-# Load keys from Streamlit secrets
+# ---------------- Load API keys from Streamlit secrets ----------------
 groq_api_key = st.secrets["GROQ_API_KEY"]
 gemini_api_key = st.secrets["GEMINI_API_KEY"]
 github_token = st.secrets["GITHUB_TOKEN"]
-github_repo = "aashiq16/RAG_pipe"   # change this if needed
+
+github_repo = "aashiq16/RAG_pipe"   # change if needed
 github_file_path = "qa_log.json"    # file inside repo
 
 # ---------------- Logging function ----------------
@@ -66,17 +67,14 @@ def log_to_github(repo, path, new_entry, token):
         st.warning(f"⚠️ Failed to log Q&A: {r.json()}")
     return r.json()
 
-
 # ---------------- Embedding creation with retry + fallback ----------------
 def create_vectors_with_retry(docs, gemini_key, max_chunks=20, retries=3):
     st.info("⚙️ Generating embeddings... please wait.")
     docs = docs[:max_chunks]  # limit to prevent timeout
 
     try:
-        embeddings = GoogleGenerativeAIEmbeddings(
-            model="models/gemini-embedding-001",
-            google_api_key=gemini_key
-        )
+        os.environ["GOOGLE_API_KEY"] = gemini_key
+        embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
     except Exception as e:
         st.warning(f"⚠️ Gemini init failed, switching to HuggingFace: {e}")
         embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
@@ -96,7 +94,6 @@ def create_vectors_with_retry(docs, gemini_key, max_chunks=20, retries=3):
     fallback_embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
     return FAISS.from_documents(docs, fallback_embeddings)
 
-
 # ---------------- Streamlit UI ----------------
 st.sidebar.title("⚙️ Settings")
 link = st.sidebar.text_input("Enter a webpage link:", "https://docs.smith.langchain.com/")
@@ -104,55 +101,55 @@ link = st.sidebar.text_input("Enter a webpage link:", "https://docs.smith.langch
 st.sidebar.markdown(
     """
     **How to use this app:**
-    1. Enter the webpage link above.  
-    2. Type your question below.  
-    3. The bot answers using only that webpage’s content.  
+    1. Enter a webpage link above.  
+    2. Ask a question below.  
+    3. The bot will answer using only that webpage’s content.  
     """
 )
 
 # ---------------- Load webpage & build vector index ----------------
 if link and ("vectors" not in st.session_state or st.session_state.get("current_link") != link):
-    st.session_state.current_link = link
-    st.session_state.loader = WebBaseLoader(link)
-    st.session_state.docs = st.session_state.loader.load()
-    st.session_state.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-    st.session_state.final_documents = st.session_state.text_splitter.split_documents(st.session_state.docs[:20])
+    try:
+        st.session_state.current_link = link
+        loader = WebBaseLoader(link)
+        docs = loader.load()
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+        final_docs = text_splitter.split_documents(docs[:20])
 
-    st.session_state.vectors = create_vectors_with_retry(
-        st.session_state.final_documents,
-        gemini_key=gemini_api_key
-    )
+        st.session_state.vectors = create_vectors_with_retry(
+            final_docs,
+            gemini_key=gemini_api_key
+        )
+    except Exception as e:
+        st.error(f"Failed to load or process webpage: {e}")
+        st.stop()
 
 # ---------------- Chat Logic ----------------
 st.title("🤖 Groq BOT InstaContext")
-st.subheader("Get instant context from a webpage.")
+st.subheader("Get instant context from any webpage.")
 
-llm = ChatGroq(groq_api_key=groq_api_key, model="openai/gpt-oss-20b")
+llm = ChatGroq(api_key=groq_api_key, model="llama3-70b-8192")
 
 prompt = ChatPromptTemplate.from_messages([
     ("system", "You are a helpful assistant. Always answer based only on the provided context."),
     ("human", """
 <context>
 {context}
-<context>
+</context>
 Question: {input}
 """)
 ])
 
 document_chain = create_stuff_documents_chain(llm, prompt)
 retriever = st.session_state.vectors.as_retriever()
-retriever_chain = RetrievalQA.from_chain_type(
-    llm=llm,
-    retriever=retriever,
-    chain_type="stuff",
-)
+retriever_chain = create_retrieval_chain(retriever, document_chain)
 
 user_question = st.text_input("Ask a question about the link:")
 
 if user_question:
     with st.spinner("🤔 Thinking..."):
-        response = retriever_chain.invoke({"query": user_question})
-        answer = response.get("result") or response.get("answer", "No answer found.")
+        response = retriever_chain.invoke({"input": user_question})
+        answer = response.get("answer") or response.get("result") or "No answer found."
     st.write(answer)
 
     # Log Q&A to GitHub
