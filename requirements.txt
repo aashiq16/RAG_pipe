@@ -1,6 +1,7 @@
 streamlit
 asyncio
 python-dotenv
+sentence-transformers
 langchain==0.1.20
 langchain-community
 langchain-core
