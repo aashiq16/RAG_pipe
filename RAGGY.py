@@ -13,7 +13,7 @@ from langchain_community.document_loaders import WebBaseLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain.chains.combine_documents.stuff import create_stuff_documents_chain
 from langchain_core.prompts import ChatPromptTemplate
-from langchain.chains import create_retrieval_chain
+from langchain.chains.retrieval import RetrievalQA
 from langchain_community.vectorstores import FAISS
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_google_genai._common import GoogleGenerativeAIError
@@ -127,7 +127,7 @@ if link and ("vectors" not in st.session_state or st.session_state.get("current_
 st.title("🤖 Groq BOT InstaContext")
 st.subheader("Get instant context from a webpage.")
 
-llm = ChatGroq(groq_api_key=groq_api_key, model_name="openai/gpt-oss-20b")
+llm = ChatGroq(groq_api_key=groq_api_key, model="openai/gpt-oss-20b")
 
 prompt = ChatPromptTemplate.from_messages([
     ("system", "You are a helpful assistant. Always answer based only on the provided context."),
@@ -141,14 +141,19 @@ Question: {input}
 
 document_chain = create_stuff_documents_chain(llm, prompt)
 retriever = st.session_state.vectors.as_retriever()
-retriever_chain = create_retrieval_chain(retriever, document_chain)
+retriever_chain = RetrievalQA.from_chain_type(
+    llm=llm,
+    retriever=retriever,
+    chain_type="stuff",
+)
 
 user_question = st.text_input("Ask a question about the link:")
 
 if user_question:
     with st.spinner("🤔 Thinking..."):
-        response = retriever_chain.invoke({"input": user_question})
-    st.write(response["answer"])
+        response = retriever_chain.invoke({"query": user_question})
+        answer = response.get("result") or response.get("answer", "No answer found.")
+    st.write(answer)
 
     # Log Q&A to GitHub
     log_to_github(
@@ -157,7 +162,7 @@ if user_question:
         new_entry={
             "timestamp": datetime.now().isoformat(),
             "question": user_question,
-            "answer": response["answer"],
+            "answer": answer,
             "source_link": link
         },
         token=github_token
