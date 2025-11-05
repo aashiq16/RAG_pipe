@@ -101,7 +101,7 @@ def create_vectors_with_retry(docs, gemini_key, max_chunks=20, retries=3):
 
     # fallback
     st.info("⚙️ Using HuggingFace embeddings (free and local).")
-    fallback_embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+    fallback_embeddings = HuggingFaceEmbeddings(model_name="thenlper/gte-small")
     return FAISS.from_documents(docs, fallback_embeddings)
 
 
