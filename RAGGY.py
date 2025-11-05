@@ -75,24 +75,35 @@ def create_vectors_with_retry(docs, gemini_key, max_chunks=20, retries=3):
     try:
         os.environ["GOOGLE_API_KEY"] = gemini_key
         embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+
+        # Quick test call to see if quota is available
+        try:
+            _ = embeddings.embed_query("test")
+        except Exception as e:
+            if "Quota exceeded" in str(e) or "429" in str(e):
+                raise GoogleGenerativeAIError("Quota exceeded for Gemini embeddings.")
+        
+        # If test passes, use Gemini normally
+        for attempt in range(retries):
+            try:
+                return FAISS.from_documents(docs, embeddings)
+            except GoogleGenerativeAIError as e:
+                st.warning(f"⚠️ Embedding attempt {attempt+1}/{retries} failed: {e}")
+                time.sleep(5)
+            except Exception as e:
+                st.error(f"Unexpected error during embeddings: {e}")
+                break
+
+    except GoogleGenerativeAIError as e:
+        st.warning(f"⚠️ Gemini quota exceeded, switching to HuggingFace embeddings: {e}")
     except Exception as e:
         st.warning(f"⚠️ Gemini init failed, switching to HuggingFace: {e}")
-        embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-
-    for attempt in range(retries):
-        try:
-            return FAISS.from_documents(docs, embeddings)
-        except GoogleGenerativeAIError as e:
-            st.warning(f"⚠️ Embedding attempt {attempt+1}/{retries} failed: {e}")
-            time.sleep(5)
-        except Exception as e:
-            st.error(f"Unexpected error during embeddings: {e}")
-            break
 
     # fallback
-    st.warning("⚠️ Gemini failed multiple times — switching to HuggingFace embeddings.")
+    st.info("⚙️ Using HuggingFace embeddings (free and local).")
     fallback_embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
     return FAISS.from_documents(docs, fallback_embeddings)
+
 
 # ---------------- Streamlit UI ----------------
 st.sidebar.title("⚙️ Settings")
